@@ -4,13 +4,8 @@
 from PySimpleAutomata import automata_IO
 import os
 import json
-
-class Node(object):
-    def __init__(self, state, transitions, accepted):
-        self.state = state
-        #self.previous = previous
-        self.transitions = transitions
-        self.accepted = accepted
+from Node import Node
+from AFN import AFN
 
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
 
@@ -26,33 +21,10 @@ for i in arr:
     if i not in operaciones and i not in alphabet:
         alphabet.append(i)
 
-# Crear nodos
-nodes = []
-nodes.append(Node(0, [], False))
-state = 1
-position = 1
-accepted = False
-for i in arr:
-    if i in alphabet:
-        if position == len(arr):
-            accepted = True
-        else:
-            next = arr[position]
-            if next in operaciones:
-                if next == '|' and arr[position+1] in alphabet:
-                    nodes.append(Node(state, [[state-1, 'epsilon']], accepted))
-                    nodes.append(Node(state + 1, [[state, arr[position-1]]], accepted))
 
-                    nodes.append(Node(state + 2, [[state-1, 'epsilon']], accepted))
-                    nodes.append(Node(state + 3, [[state+2, arr[position+1]]], accepted))
 
-                    nodes.append(Node(state + 4, [[state+1, 'epsilon'], [state+3, 'epsilon']], accepted))
-                    state += 5
-            else:      
-                nodes.append(Node(state, [[state-1, i]], accepted))
-                state += 1
-    position+=1
-        
+afn = AFN(arr, alphabet)
+nodes = afn.generateAFN()
 graph = {
     "alphabet": alphabet,
     "states": [],
