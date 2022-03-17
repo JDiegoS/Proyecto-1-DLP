@@ -1,24 +1,13 @@
 digraph {
 	fake0 [style=invisible]
-	5
-	8 [shape=doublecircle]
-	4
-	0 [root=true]
-	1
 	2
-	3
-	7
-	6
+	1
+	0 [root=true]
+	3 [shape=doublecircle]
 	fake0 -> 0 [style=bold]
-	5 -> 0 [label=epsilon]
-	0 -> 3 [label=epsilon]
-	0 -> 5 [label=epsilon]
 	0 -> 1 [label=epsilon]
+	0 -> 3 [label=epsilon]
+	2 -> 1 [label=epsilon]
+	2 -> 3 [label=epsilon]
 	1 -> 2 [label=a]
-	3 -> 4 [label=b]
-	2 -> 5 [label=epsilon]
-	4 -> 5 [label=epsilon]
-	5 -> 6 [label=a]
-	6 -> 7 [label=b]
-	7 -> 8 [label=b]
 }

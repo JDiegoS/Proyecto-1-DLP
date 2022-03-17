@@ -8,36 +8,43 @@ class AFN(object):
         self.alphabet = alphabet
         self.state = 1
         self.operaciones = ['(', ')', '+', '|', '*']
-        self.lastOpenP = 0
-        self.lastCloseP = 0
 
     def changeState(self, state):
         self.state = state
 
     def orOp(self, state, position, accepted):
         self.nodes.append(Node(str(state), [[str(state-1), 'epsilon']], False))
-        self.nodes.append(Node(str(state+1), [[str(state), self.arr[position-1]]], False))
 
-        self.nodes.append(Node(str(state+2), [[str(state-1), 'epsilon']], False))
-        self.nodes.append(Node(str(state+3), [[str(state+2), self.arr[position+1]]], False))
+        self.nodes.append(Node(str(state+1), [[str(state), 'epsilon']], False))
+        self.nodes.append(Node(str(state+2), [[str(state+1), self.arr[position-1]]], False))
 
-        self.nodes.append(Node(str(state+4), [[str(state+1), 'epsilon'], [state+3, 'epsilon']], accepted))
+        self.nodes.append(Node(str(state+3), [[str(state), 'epsilon']], False))
+        self.nodes.append(Node(str(state+4), [[str(state+3), self.arr[position+1]]], False))
+
+        self.nodes.append(Node(str(state+5), [[str(state+2), 'epsilon'], [state+4, 'epsilon']], False))
+        self.nodes.append(Node(str(state+6), [[str(state+5), 'epsilon']], accepted))
 
     def concatOp(self, state, accepted, i):
         self.nodes.append(Node(str(state), [[str(state-1), i]], accepted))
 
     def kleeneOp(self, first):
         for i in self.nodes:
-            if i.state == first:
-                i.transitions.append([str(self.nodes[-1].state), 'epsilon'])
+            if i.state == str(first) or i.state == first:
+                i.transitions.append([str(self.nodes[-2].state), 'epsilon'])
 
-        self.nodes[-1].transitions.append([str(first), 'epsilon'])
+        self.nodes[-1].transitions.append([str(first-1), 'epsilon'])
+    
+    def positiveOp(self, first):
+        for i in self.nodes:
+            if i.state == str(first) or i.state == first:
+                i.transitions.append([str(self.nodes[-1].state), 'epsilon'])
         
     def parenthesisOp(self, state, position, accepted):
         operacionP = []
         searching = True
         fKleene = False
-        start = state-1
+        fPositive = False
+        start = state
         while searching and position <= len(self.arr):
             if self.arr[position] == ')':
                 if position+1 == len(self.arr):
@@ -46,8 +53,12 @@ class AFN(object):
                     if position+2 == len(self.arr):
                         accepted = True
                     fKleene = True
+                elif self.arr[position+1] == '+':
+                    if position+2 == len(self.arr):
+                        accepted = True
+                    fPositive = True
                 searching = False
-                self.lastCloseP = position - 1
+
             else:
                 operacionP.append(self.arr[position])
             position += 1
@@ -62,6 +73,8 @@ class AFN(object):
             self.nodes.append(j)
         if fKleene:
             self.kleeneOp(start)
+        elif fPositive:
+            self.positiveOp(start)
 
     def generateAFN(self):
         # Crear nodos
@@ -79,30 +92,42 @@ class AFN(object):
                     # Siguiente posicion
                     next = self.arr[position]
                     if next in self.operaciones:
-                        # Or
+                        # Seguido por Or
                         if next == '|' and self.arr[position+1] in self.alphabet:
                             if position+2 == len(self.arr):
                                 accepted = True
                             self.orOp(self.state, position, accepted)
-                            self.state += 5
+                            self.state += 7
                         # Seguido por paretnesis
                         elif next == '(' and self.arr[position-2] != '|':
                             self.concatOp(self.state, accepted, i)
                             self.state += 1
+                        # Seguido por Kleene
                         elif next == '*':
+                            self.nodes.append(Node(str(self.state), [[str(self.state-1), 'epsilon']], False))
+                            if position+1 == len(self.arr):
+                                accepted = True
+                            self.concatOp(self.state+1, False, i)
+                            self.nodes.append(Node(str(self.state+2), [[str(self.state+1), 'epsilon']], accepted))
+                            self.kleeneOp(self.state)
+                            self.state += 3
+                        # Seguido por positiva
+                        elif next == '+':
                             if position+1 == len(self.arr):
                                 accepted = True
                             self.concatOp(self.state, accepted, i)
-                            self.kleeneOp(self.state-1)
+                            self.positiveOp(self.state-1)
                             self.state += 1
+                    # Concatenacion 
                     elif self.arr[position-2] != '|': 
-                        # Concatenacion     
                         self.concatOp(self.state, accepted, i)
                         self.state += 1
+            # Parentesis
             elif i == '(' and self.arr[position] in self.alphabet:
-                # Parentesis
-                self.lastOpenP = position-1
                 self.parenthesisOp(self.state, position, accepted)
+            elif i not in self.operaciones:
+                print('Hay un error en la expresion (' + i + ')')
+                break
             position += 1
         #Regresar nodos generados
         return self.nodes
