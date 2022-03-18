@@ -1,4 +1,3 @@
-from tkinter import N
 from AFN import AFN
 from Node import Node
 
@@ -16,6 +15,7 @@ class Subconjuntos(object):
             self.table.append([i])
 
     def cerraduraEpsilon(self, states):
+        # Buscar a que estados se puede llegar con epsilon
         conjunto = []
         for s in states:
             if s not in conjunto:
@@ -26,6 +26,7 @@ class Subconjuntos(object):
         return conjunto
 
     def mover(self, states, value):
+        # Buscar a que estados se puede llegar con value
         conjunto = []
         for i in self.transitions:
             if i[2] not in conjunto and i[0] in states and i[1] == value:
@@ -33,12 +34,13 @@ class Subconjuntos(object):
         return conjunto
 
     def addState(self, conj):
+        # Agregar nuevo estado a la tabla
         self.table[0].append(conj)
         self.table[1].append('s'+str(self.state))
 
     def getNodes(self):
+        # Genera los nodos del AFD
         num = 0
-        #print(self.newAccepted)
         for i in self.table[1]:
             if i[0] == 's':
                 accepted = i in self.newAccepted
@@ -54,6 +56,7 @@ class Subconjuntos(object):
                 num += 1
 
     def generateAFD(self):
+        # Genera el AFD
         building = True
         currentC = '0'
         cIndex = 1
@@ -61,20 +64,24 @@ class Subconjuntos(object):
             conj = self.cerraduraEpsilon(currentC)
             searching = True
             while searching:
+                # Cerradura de epsilon
                 nConjunto = self.cerraduraEpsilon(conj)
                 if nConjunto == conj:
                     searching = False
                 else:
                     conj = nConjunto
             conj.sort()
-            if conj not in self.table[0]:
-                self.addState(conj)
-                for i in self.accepted:
-                    if i in conj:
-                        self.newAccepted.append('s'+str(self.state))
-                self.state += 1
+            if len(conj) > 0:
+                if conj not in self.table[0]:
+                    # Agregar nuevo estado
+                    self.addState(conj)
+                    for i in self.accepted:
+                        if i in conj:
+                            self.newAccepted.append('s'+str(self.state))
+                    self.state += 1
             nChar = 2
             for i in self.alphabet:
+                # Buscar transiciones del estado
                 trans = self.mover(conj, i)
                 trans.sort()
 
@@ -87,21 +94,29 @@ class Subconjuntos(object):
                     else:
                         conj2 = nConjunto
                 conj2.sort()
-                if conj2 not in self.table[0]:
-                    self.addState(conj2)
-                    self.table[nChar].append('s'+str(self.state))
-                    for i in self.accepted:
-                        if i in conj2:
-                            self.newAccepted.append('s'+str(self.state))
-                    self.state += 1
+                if len(conj2) > 0:
+                    if conj2 not in self.table[0]:
+                        # Si no esta en la tabla, agregar estado
+                        self.addState(conj2)
+                        self.table[nChar].append('s'+str(self.state))
+                        for i in self.accepted:
+                            if i in conj2:
+                                self.newAccepted.append('s'+str(self.state))
+                        self.state += 1
+                    else:
+                        # Agregar transicion
+                        indx = self.table[0].index(conj2)
+                        self.table[nChar].append('s'+str(indx-1))
                 else:
-                    indx = self.table[0].index(conj2)
-                    self.table[nChar].append('s'+str(indx-1))
+                    # No tiene transicion
+                    self.table[nChar].append('none')
                 nChar += 1
             cIndex += 1
             if len(self.table[0]) == len(self.table[-1]):
+                # Se lleno la tabla
                 building = False
             else:
+                # Siguiente estado
                 currentC = self.table[0][cIndex]
   
         self.getNodes()

@@ -1,1 +1,1 @@
-{"alphabet": ["a"], "states": ["s0", "s1"], "initial_state": "s0", "accepting_states": ["s0", "s1"], "transitions": [["s0", "a", "s1"], ["s1", "a", "s1"]]}
+{"alphabet": ["a", "b"], "states": ["s0", "s1", "s2", "s3", "s4"], "initial_state": "s0", "accepting_states": ["s4"], "transitions": [["s0", "a", "s1"], ["s1", "a", "s1"], ["s2", "a", "s1"], ["s3", "a", "s1"], ["s4", "a", "s1"], ["s0", "b", "s2"], ["s2", "b", "s2"], ["s4", "b", "s2"], ["s1", "b", "s3"], ["s3", "b", "s4"]]}

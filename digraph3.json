@@ -1,0 +1,1 @@
+{"alphabet": ["a", "b"], "states": ["s0", "s1", "s2", "s3"], "initial_state": "s0", "accepting_states": ["s3"], "transitions": [["s0", "b", "s0"], ["s3", "b", "s0"], ["s0", "a", "s1"], ["s1", "a", "s1"], ["s2", "a", "s1"], ["s3", "a", "s1"], ["s1", "b", "s2"], ["s2", "b", "s3"]]}

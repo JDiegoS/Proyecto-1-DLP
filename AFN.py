@@ -37,7 +37,7 @@ class AFN(object):
     def positiveOp(self, first):
         for i in self.nodes:
             if i.state == str(first) or i.state == first:
-                i.transitions.append([str(self.nodes[-1].state), 'epsilon'])
+                i.transitions.append([str(self.nodes[-2].state), 'epsilon'])
         
     def parenthesisOp(self, state, position, accepted):
         operacionP = []
@@ -113,10 +113,12 @@ class AFN(object):
                             self.state += 3
                         # Seguido por positiva
                         elif next == '+':
+                            self.nodes.append(Node(str(self.state), [[str(self.state-1), 'epsilon']], False))
                             if position+1 == len(self.arr):
                                 accepted = True
-                            self.concatOp(self.state, accepted, i)
-                            self.positiveOp(self.state-1)
+                            self.concatOp(self.state+1, False, i)
+                            self.nodes.append(Node(str(self.state+2), [[str(self.state+1), 'epsilon']], accepted))
+                            self.positiveOp(self.state)
                             self.state += 1
                     # Concatenacion 
                     elif self.arr[position-2] != '|': 
