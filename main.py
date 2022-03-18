@@ -99,8 +99,7 @@ with open('digraph3.json', 'w') as outfile:
     json.dump(graph3, outfile)
 dfa_example = automata_IO.dfa_json_importer('./digraph3.json')
 automata_IO.dfa_to_dot(dfa_example, 'expresionsAFD', './')
-'''
-Simulacion
+
 opc = ''
 while opc != '0':
     opc = input('\nIngrese una cadena para evaluar (0 para salir): ')
@@ -108,20 +107,23 @@ while opc != '0':
     
     orderedTrans = []
     indx = 0
-    for i in graph3['transitions']:
+    for i in graph2['transitions']:
         if i[0] == str(indx):
             orderedTrans.append(i)
-    currentState = 0
+    currentState = 's0'
     failed = False
     for i in cadena:
         failed = True
-        for i in graph3['transitions']:
-            if i[0] == currentState and i[1] == i:
-                currentState = i[2]
+        for j in graph2['transitions']:
+            if j[0] == currentState and j[1] == i:
+                currentState = j[2]
+                print(currentState)
                 failed = False
                 #continue
         if failed == True:
-            print("NO CON THOMPSON")
+            print("NO CON SUBCONJUNTOS")
             break
-'''
+    if failed == False:
+        print('SI CON SUBCONJUNTOS')
+        
 
