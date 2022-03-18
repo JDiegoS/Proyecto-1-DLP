@@ -101,7 +101,7 @@ class AFDe(object):
                         # Caracter que sigue
                         next = self.arr[position+1]
 
-                    if next not in self.operaciones and previous != '|':
+                    if position > 0 and next not in self.operaciones and previous != '|':
                         # Concatenacion con caracter previo
                         if previous != ')':
                             if self.arbol[4][-1]:
