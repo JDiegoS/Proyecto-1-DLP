@@ -105,11 +105,6 @@ while opc != '0':
     opc = input('\nIngrese una cadena para evaluar (0 para salir): ')
     cadena = list(opc)
     
-    orderedTrans = []
-    indx = 0
-    for i in graph2['transitions']:
-        if i[0] == str(indx):
-            orderedTrans.append(i)
     currentState = 's0'
     failed = False
     for i in cadena:
@@ -119,11 +114,32 @@ while opc != '0':
                 currentState = j[2]
                 print(currentState)
                 failed = False
-                #continue
+                break
         if failed == True:
             print("NO CON SUBCONJUNTOS")
             break
-    if failed == False:
+    if failed == False and currentState in graph2['accepting_states']:
         print('SI CON SUBCONJUNTOS')
+    else:
+        print("NO CON SUBCONJUNTOS")
+
+
+    currentState = 's0'
+    failed = False
+    for i in cadena:
+        failed = True
+        for j in graph3['transitions']:
+            if j[0] == currentState and j[1] == i:
+                currentState = j[2]
+                print(currentState)
+                failed = False
+                break
+        if failed == True:
+            print("NO CON EXPRESION")
+            break
+    if failed == False and currentState in graph3['accepting_states']:
+        print('SI CON EXPRESION')
+    else:
+        print("NO CON EXPRESION")
         
 
